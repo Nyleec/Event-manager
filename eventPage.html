@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Eventbrite Event</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
+    form {
+      max-width: 500px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin: 1rem 0 0.3rem;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.7rem 1.5rem;
+      background-color: #f05537;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Create Event</h2>
+  <form id="eventForm">
+    <label for="name">Event Name</label>
+    <input type="text" id="name" name="event.name.html" required>
+
+    <label for="description">Event Description </label>
+    <textarea id="description" name="event.description.html" rows="5" required></textarea>
+
+    <label for="start">Start Date and Time (UTC)</label>
+    <input type="datetime-local" id="start" name="event.start.utc" required>
+
+    <label for="start_timezone">Start Timezone</label>
+    <input type="text" id="start_timezone" name="event.start.timezone" value="UTC" required>
+
+    <label for="end">End Date and Time (UTC)</label>
+    <input type="datetime-local" id="end" name="event.end.utc" required>
+
+    <label for="end_timezone">End Timezone</label>
+    <input type="text" id="end_timezone" name="event.end.timezone" value="UTC" required>
+
+    <label for="currency">Currency</label>
+    <select id="currency" name="event.currency" required>
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+      <option value="GBP">GBP</option>
+      <option value="AUD">AUD</option>
+      <option value="CAD">CAD</option>
+    </select>
+
+    <button type="submit">Create Event</button>
+  </form>
+
+  <script src="eventPage.js"></script>
+  
+</body>
+</html>

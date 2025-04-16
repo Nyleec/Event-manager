@@ -162,9 +162,101 @@ async function checkoutTicket(eventId, ticketClassId, attendee, quantity) {
   }
 }
 
+/**
+ * Read and parse the current events.json file.
+ * @returns {Promise<Array>} Array of event objects.
+ */
+async function readEventsFile() {
+  try {
+    const data = await fs.readFile(eventsFilePath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error("Failed to read or parse events.json:", error);
+    return [];
+  }
+}
+
+/**
+ * Convert the events array to a map keyed by eventId.
+ * @returns {Promise<Object>} Object with eventId keys.
+ */
+async function getEventsAsMap() {
+  const eventsArray = await readEventsFile();
+  return eventsArray.reduce((map, event) => {
+    if (event.eventId) map[event.eventId] = event;
+    return map;
+  }, {});
+}
+
+/**
+ * Get simplified list of events with selected fields.
+ * @returns {Promise<Array>} Array of simplified event objects.
+ */
+async function getSimplifiedEvents() {
+  const eventsArray = await readEventsFile();
+  return eventsArray.map(event => ({
+    id: event.eventId,
+    name: event.name,
+    start: event.start?.utc,
+    end: event.end?.utc,
+    currency: event.currency,
+  }));
+}
+
+/**
+ * Get events with optional filters and sort.
+ * @param {Function} [filterFn] Optional filter function.
+ * @param {Function} [sortFn] Optional sort function.
+ * @returns {Promise<Array>} Filtered and sorted array.
+ */
+async function getFilteredEvents(filterFn = () => true, sortFn = () => 0) {
+  const simplified = await getSimplifiedEvents();
+  return simplified.filter(filterFn).sort(sortFn);
+}
+// Example usage
+/* sort by soonest date
+const upcoming = await getFilteredEvents(
+  () => true,
+  (a, b) => new Date(a.start) - new Date(b.start)
+);
+
+// filter by currency
+const usdEvents = await getFilteredEvents(e => e.currency === 'USD');
+
+*/
+
+/**
+ * Search events by keyword in name or description (case-insensitive).
+ * @param {string} keyword The keyword to search for.
+ * @returns {Promise<Array>} Array of matching events.
+ */
+async function searchEventsByKeyword(keyword) {
+  const lowerKeyword = keyword.toLowerCase();
+  const eventsArray = await readEventsFile();
+
+  return eventsArray.filter(event => {
+    const name = event.name?.toLowerCase() || '';
+    const description = event.description?.toLowerCase() || '';
+    return name.includes(lowerKeyword) || description.includes(lowerKeyword);
+  });
+}
+
+/*Example
+const { searchEventsByKeyword } = require('./DB');
+
+(async () => {
+  const results = await searchEventsByKeyword('music');
+  console.log('Matching events:', results);
+})();
+*/
+
 module.exports = {
   addEvent,
   getEvents,
   fetchAllEvents,
   checkoutTicket,
+  getEventsAsMap,
+  getSimplifiedEvents,
+  getFilteredEvents,
+  searchEventsByKeyword,
 };

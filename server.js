@@ -1,12 +1,31 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const fs = require('fs/promises');
+const path = require('path');
 require('dotenv').config();
-
 const app = express();
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 const { addEvent } = require('./db'); 
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server listening on http://localhost:${PORT}`);
+});
+app.use(express.static(path.join(__dirname))); // for serving your HTML/JS/CSS files
+
+
+app.get('/api/events', async (req, res) => {
+  try {
+    const filePath = path.join(__dirname, 'events.json');
+    const data = await fs.readFile(filePath, 'utf8');
+    res.json(JSON.parse(data));
+  } catch (error) {
+    console.error("Error reading events.json:", error);
+    res.status(500).json({ error: 'Failed to load events' });
+  }
+});
+
 
 
 const EVENTBRITE_TOKEN = process.env.EVENTBRITE_TOKEN;
@@ -49,8 +68,3 @@ app.post('/checkout', async (req, res) => {
   }
 });
 
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
-});

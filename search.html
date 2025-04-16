@@ -9,34 +9,37 @@
   </style>
 </head>
 <body>
-<a href="eventPage.html">Go to Create Event</a>
-
-  <h1>Events</h1>
-
-  <label>
-    Start Date:
-    <input type="date" id="startDate" />
-  </label>
-  <label>
-    End Date:
-    <input type="date" id="endDate" />
-  </label>
-
-  <label>
-    Sort by:
-    <select id="sortSelect">
-      <option value="soonest">Soonest</option>
-      <option value="latest">Latest</option>
-    </select>
-  </label>
-
-  <button onclick="resetFilters()">Reset Filters</button>
-
-  <input type="text" id="keywordInput" placeholder="Search by keyword" />
-  <button onclick="filterEvents()">Search</button>
-
-  <div id="eventsContainer"></div>
-
-  <script src="script.js"></script>
+    <a href="eventPage.html">Go to Create Event</a>
+  
+    <h1>Events</h1>
+  
+    <label>
+      Start Date:
+      <input type="date" id="startDate" />
+    </label>
+    <label>
+      End Date:
+      <input type="date" id="endDate" />
+    </label>
+  
+    <label>
+      Sort by:
+      <select id="sortSelect">
+        <option value="soonest">Soonest</option>
+        <option value="latest">Latest</option>
+      </select>
+    </label>
+  
+    <button onclick="resetFilters()">Reset Filters</button>
+  
+    <input type="text" id="keywordInput" placeholder="Search by keyword" />
+    <button onclick="filterEvents()">Search</button>
+  
+    <button onclick="deleteSelectedEvents()">Delete Selected Events</button> <!-- Button to delete selected events -->
+  
+    <div id="eventsContainer"></div>
+  
+    <script src="script.js"></script>
+  </body>
 </body>
 </html>

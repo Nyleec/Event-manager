@@ -11,33 +11,72 @@ async function fetchEvents() {
         .slice(0, 10);
   
       displayEvents(upcoming);
+      console.log('All Events:', allEvents);
     } catch (err) {
       console.error('Failed to fetch events:', err);
     }
   }
   
 
-function displayEvents(events) {
-  const container = document.getElementById('eventsContainer');
-  container.innerHTML = ''; // clear old content
-
-  if (events.length === 0) {
-    container.innerHTML = '<p>No events found.</p>';
-    return;
-  }
-
-  for (const event of events) {
-    const div = document.createElement('div');
-    div.className = 'event';
-    div.innerHTML = `
+  function displayEvents(events) {
+    const container = document.getElementById('eventsContainer');
+    container.innerHTML = ''; // clear old content
+  
+    if (events.length === 0) {
+      container.innerHTML = '<p>No events found.</p>';
+      return;
+    }
+  
+    for (const event of events) {
+      const div = document.createElement('div');
+      div.className = 'event';
+      div.innerHTML = `
+      <input type="checkbox" class="event-checkbox" data-event-id="${event.id}" />
       <h3>${event.name || 'Untitled Event'}</h3>
       <p><strong>Start:</strong> ${event.start?.utc || 'N/A'}</p>
       <p><strong>End:</strong> ${event.end?.utc || 'N/A'}</p>
       <p><strong>Currency:</strong> ${event.currency || 'N/A'}</p>
       <p>${event.description || ''}</p>
     `;
-    container.appendChild(div);
+      console.log('Event ID:', event.id);
+      container.appendChild(div);
+    }
   }
+  
+
+async function deleteSelectedEvents() {
+  const checkboxes = document.querySelectorAll('.event-checkbox:checked');
+  console.log('Selected Checkboxes:', checkboxes); // Debugging
+  const eventIds = Array.from(checkboxes).map(cb => cb.dataset.eventId);
+  console.log('Selected Event IDs:', eventIds); // Debugging
+
+  if (eventIds.length === 0) {
+    alert('No events selected for deletion.');
+    return;
+  }
+
+  const confirmDelete = confirm('Are you sure you want to delete the selected events?');
+  if (!confirmDelete) return;
+
+  for (const eventId of eventIds) {
+    try {
+      const response = await fetch(`http://localhost:3000/api/events/${eventId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        console.log(`Event ${eventId} deleted successfully.`);
+      } else {
+        const error = await response.json();
+        console.error(`Failed to delete event ${eventId}:`, error.error);
+      }
+    } catch (err) {
+      console.error(`Error deleting event ${eventId}:`, err);
+    }
+  }
+
+  // Refresh the event list after deletion
+  fetchEvents();
 }
 
 function filterEvents() {

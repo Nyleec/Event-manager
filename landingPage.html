@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .slideshow-container {
+      position: relative;
+      max-width: 1000px;
+      margin: auto;
+      overflow: hidden;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .slide {
+      display: none;
+      text-align: center;
+    }
+    .slide img {
+      width: 100%;
+      border-radius: 10px 10px 0 0;
+    }
+    .slide h2 {
+      margin: 10px 0;
+      font-size: 24px;
+    }
+    .slide p {
+      margin: 0 20px 20px;
+      font-size: 16px;
+      color: #555;
+    }
+    .prev, .next {
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      width: auto;
+      margin-top: -22px;
+      padding: 16px;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      border-radius: 0 3px 3px 0;
+      user-select: none;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    .next {
+      right: 0;
+      border-radius: 3px 0 0 3px;
+    }
+    .prev:hover, .next:hover {
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+    .dots {
+      text-align: center;
+      margin: 10px 0;
+    }
+    .dot {
+      cursor: pointer;
+      height: 15px;
+      width: 15px;
+      margin: 0 5px;
+      background-color: #bbb;
+      border-radius: 50%;
+      display: inline-block;
+      transition: background-color 0.6s ease;
+    }
+    .active, .dot:hover {
+      background-color: #717171;
+    }
+  </style>
+</head>
+<body>
+  <div class="slideshow-container" id="slideshow-container">
+    <!-- Slides will be dynamically added here -->
+  </div>
+
+  <!-- Dots -->
+  <div class="dots" id="dots-container">
+    <!-- Dots will be dynamically added here -->
+  </div>
+
+  <script>
+    let slideIndex = 1;
+    let autoScrollInterval;
+  
+    // Fetch events from the server and populate the slideshow
+    async function loadEvents() {
+      try {
+        const response = await fetch('http://localhost:3000/api/events'); // Fetch from server
+        const events = await response.json();
+  
+        const slideshowContainer = document.getElementById('slideshow-container');
+        const dotsContainer = document.getElementById('dots-container');
+  
+        events.forEach((event, index) => {
+          // Create slide
+          const slide = document.createElement('div');
+          slide.className = 'slide';
+          slide.innerHTML = `
+            <img src="event${index + 1}.jpg" alt="${event.name}">
+            <h2>${event.name}</h2>
+            <p>${event.description}</p>
+          `;
+          slideshowContainer.appendChild(slide);
+  
+          // Create dot
+          const dot = document.createElement('span');
+          dot.className = 'dot';
+          dot.onclick = () => {
+            setSlide(index + 1);
+            resetAutoScroll(); // Reset auto-scroll when a dot is clicked
+          };
+          dotsContainer.appendChild(dot);
+        });
+  
+        showSlide(slideIndex);
+        startAutoScroll(); // Start auto-scroll after loading events
+      } catch (error) {
+        console.error('Error loading events:', error);
+      }
+    }
+  
+    function changeSlide(n) {
+      showSlide(slideIndex += n);
+      resetAutoScroll(); // Reset auto-scroll when manually changing slides
+    }
+  
+    function setSlide(n) {
+      showSlide(slideIndex = n);
+    }
+  
+    function showSlide(n) {
+      const slides = document.getElementsByClassName('slide');
+      const dots = document.getElementsByClassName('dot');
+      if (n > slides.length) slideIndex = 1;
+      if (n < 1) slideIndex = slides.length;
+      for (let i = 0; i < slides.length; i++) {
+        slides[i].style.display = 'none';
+      }
+      for (let i = 0; i < dots.length; i++) {
+        dots[i].className = dots[i].className.replace(' active', '');
+      }
+      slides[slideIndex - 1].style.display = 'block';
+      dots[slideIndex - 1].className += ' active';
+    }
+  
+    function startAutoScroll() {
+      autoScrollInterval = setInterval(() => {
+        changeSlide(1); // Move to the next slide every 3 seconds
+      }, 3000);
+    }
+  
+    function resetAutoScroll() {
+      clearInterval(autoScrollInterval); // Stop the current interval
+      startAutoScroll(); // Restart the auto-scroll
+    }
+  
+    // Initialize the slideshow
+    loadEvents();
+  </script>
+</body>
+</html>
